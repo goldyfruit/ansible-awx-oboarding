@@ -26,13 +26,13 @@
 
   tasks:
     - name: Create "{{ onboarding_app_code }}" team
-      awx.team:
+      awx.awx.team:
         name: "{{ onboarding_team_name }}"
         description: "{{ onboarding_team_description }}"
         organization: "{{ onboarding_organization }}"
 
     - name: Create "{{ onboarding_app_code }}" smart inventory
-      awx.inventory:
+      awx.awx.inventory:
         name: "{{ onboarding_inventory_name }}"
         description: "{{ onboarding_inventory_description }}"
         organization: "{{ onboarding_organization }}"
@@ -40,14 +40,14 @@
         host_filter: "{{ onboarding_inventory_host_filter }}"
 
     - name: Add "{{ onboarding_team_name }}" to "{{ onboarding_inventory_name }}" inventory
-      awx.role:
+      awx.awx.role:
         user: "{{ onboarding_team_name }}"
         role: use
         inventories:
           - "{{ onboarding_inventory_name }}"
 
     - name: Create "{{ onboarding_job_name }}" job template
-      awx.job_template:
+      awx.awx.job_template:
         name: "{{ onboarding_job_name }}"
         job_type: run
         organization: "{{ onboarding_organization }}"
@@ -62,7 +62,7 @@
         allow_simultaneous: yes
 
     - name: Add "{{ onboarding_team_name }}" to "{{ onboarding_job_name }}" template
-      awx.role:
+      awx.awx.role:
         user: "{{ onboarding_team_name }}"
         role: admin
         job_templates:
