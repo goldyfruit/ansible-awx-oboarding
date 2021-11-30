@@ -1,6 +1,7 @@
 ---
 - name: On-board new user to Ansible Tower
-  hosts: controller
+  hosts: localhost
+  connection: local
   gather_facts: false
 
   vars:
@@ -68,3 +69,11 @@
         role: admin
         job_templates:
           - "{{ onboarding_job_name }}"
+
+    - name: Add LDAP group mapping
+      awx.awx.settings:
+        settings:
+          AUTH_LDAP_USER_ATTR_MAP:
+            email: "mail"
+            first_name: "givenName"
+            last_name: "surname"
