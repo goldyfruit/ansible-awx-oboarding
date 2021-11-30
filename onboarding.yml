@@ -11,8 +11,10 @@
     onboarding_team_name: "{{ onboarding_app_code }}"
     onboarding_team_description: "{{ onboarding_app_code }} application team"
     onboarding_inventory_name: "Linux_SP_{{ onboarding_app_code }}"
-    onboarding_inventory_description: "Linux servers owned by ${onboarding_app_code} application"
-    onboarding_inventory_host_filter: "inventory.name=URPROD_SelfPatch_Linux_Master_Inventory and variables.icontains={{ onboarding_app_code }}"
+    onboarding_inventory_description: "Linux servers owned by {{ onboarding_app_code }} application"
+    onboarding_inventory_host_filter: >-
+      inventory__name=URPROD_SelfPatch_Linux_Master_Inventory and
+      variables__icontains={{ onboarding_app_code }}
     onboarding_job_name: "Patch_Level_{{ onboarding_app_code }}"
     onboarding_job_description: "Patching job owned by ${onboarding_app_code} application"
     onboarding_job_project: Ansible Tower Demo
@@ -43,8 +45,7 @@
       awx.awx.role:
         user: "{{ onboarding_team_name }}"
         role: use
-        inventories:
-          - "{{ onboarding_inventory_name }}"
+        inventories: "{{ onboarding_inventory_name }}"
 
     - name: Create "{{ onboarding_job_name }}" job template
       awx.awx.job_template:
