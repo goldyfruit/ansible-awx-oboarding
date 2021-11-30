@@ -43,7 +43,7 @@
 
     - name: Add "{{ onboarding_team_name }}" to "{{ onboarding_inventory_name }}" inventory
       awx.awx.role:
-        target_team: "{{ onboarding_team_name }}"
+        team: "{{ onboarding_team_name }}"
         role: use
         inventories:
           - "{{ onboarding_inventory_name }}"
@@ -64,7 +64,7 @@
 
     - name: Add "{{ onboarding_team_name }}" to "{{ onboarding_job_name }}" template
       awx.awx.role:
-        target_team: "{{ onboarding_team_name }}"
+        team: "{{ onboarding_team_name }}"
         role: admin
         job_templates:
           - "{{ onboarding_job_name }}"
