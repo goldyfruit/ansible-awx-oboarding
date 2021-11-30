@@ -53,8 +53,7 @@
         name: "{{ onboarding_job_name }}"
         job_type: run
         organization: "{{ onboarding_organization }}"
-        inventories:
-          - "{{ onboarding_inventory_name }}"
+        inventory: "{{ onboarding_inventory_name }}"
         project: "{{ onboarding_job_project }}"
         playbook: "{{ onboarding_job_playbook }}"
         credentials: "{{ onboarding_job_credentials }}"
