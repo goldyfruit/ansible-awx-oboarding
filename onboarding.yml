@@ -1,6 +1,6 @@
 ---
 - name: On-board new user to Ansible Tower
-  host: controller
+  hosts: controller
   gather_facts: false
 
   vars:
