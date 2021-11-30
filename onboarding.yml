@@ -1,0 +1,69 @@
+---
+- name: On-board new user to Ansible Tower
+  host: controller
+  gather_facts: false
+
+  vars:
+    onboarding_controller_host: 127.0.0.1
+    onboarding_controller_ssl: no
+    onboarding_app_code: UIT0
+    onboarding_organization: UTI0_SelfPatch
+    onboarding_team_name: "{{ onboarding_app_code }}"
+    onboarding_team_description: "{{ onboarding_app_code }} application team"
+    onboarding_inventory_name: "Linux_SP_{{ onboarding_app_code }}"
+    onboarding_inventory_description: "Linux servers owned by ${onboarding_app_code} application"
+    onboarding_inventory_host_filter: "inventory__name='URPROD_SelfPatch_Linux_Master_Inventory' and variables__icontains='{{ onboarding_app_code }}'"
+    onboarding_job_name: "Patch_Level_{{ onboarding_app_code }}"
+    onboarding_job_description: "Patching job owned by ${onboarding_app_code} application"
+    onboarding_job_project: Ansible Tower Demo
+    onboarding_job_playbook: display_patch_level_linux.yml
+    onboarding_job_credentials:
+      - devroot
+
+  environment:
+    CONTROLLER_HOST: "{{ onboarding_controller_host }}"
+    CONTROLLER_VERIFY_SSL: "{{ onboarding_controller_ssl }}"
+
+  tasks:
+    - name: Create {{ onboarding_app_code }} team
+      awx.team:
+        name: "{{ onboarding_team_name }}"
+        description: "{{ onboarding_team_description }}"
+        organization: "{{ onboarding_organization }}"
+
+    - name: Create {{ onboarding_app_code }} smart inventory
+      awx.inventory:
+        name: "{{ onboarding_inventory_name }}"
+        description: "{{ onboarding_inventory_description }}"
+        organization: "{{ onboarding_organization }}"
+        kind: smart
+        host_filter: "{{ onboarding_inventory_host_filter }}"
+
+    - name: Add {{ onboarding_team_name }} to {{ onboarding_inventory_name }} inventory
+      awx.role:
+        user: "{{ onboarding_team_name }}"
+        role: use
+        inventories:
+          - "{{ onboarding_inventory_name }}"
+
+    - name: Create {{ onboarding_job_name }} job template
+      awx.job_template:
+        name: "{{ onboarding_job_name }}"
+        job_type: run
+        organization: "{{ onboarding_organization }}"
+        inventories:
+          - "{{ onboarding_inventory_name }}"
+        project: "{{ onboarding_job_project }}"
+        playbook: "{{ onboarding_job_playbook }}"
+        credentials: "{{ onboarding_job_credentials }}"
+        ask_limit_on_launch: yes
+        ask_job_type_on_launch: yes
+        ask_inventory_on_launch: yes
+        allow_simultaneous: yes
+
+    - name: Add {{ onboarding_team_name }} to {{ onboarding_job_name }} template
+      awx.role:
+        user: "{{ onboarding_team_name }}"
+        role: admin
+        job_templates:
+          - "{{ onboarding_job_name }}"
