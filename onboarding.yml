@@ -45,7 +45,7 @@
       awx.awx.role:
         user: "{{ onboarding_team_name }}"
         role: use
-        inventories: "{{ onboarding_inventory_name }}"
+        inventory: "{{ onboarding_inventory_name }}"
 
     - name: Create "{{ onboarding_job_name }}" job template
       awx.awx.job_template:
