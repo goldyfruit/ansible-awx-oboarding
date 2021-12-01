@@ -31,7 +31,7 @@
   tasks:
     - name: Retrieve Ansible Tower current LDAP configuration
       ansible.builtin.uri:
-        url: "{{ lookup('env', 'CONTROLLER_HOST') | default(onboarding_controller_host) }}/api/v2/settings/ldap"
+        url: "{{ onboarding_controller_host }}/api/v2/settings/ldap"
         method: GET
         return_content: yes
         headers:
