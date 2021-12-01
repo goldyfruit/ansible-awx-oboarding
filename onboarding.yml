@@ -32,7 +32,7 @@
         return_content: yes
         headers:
           Authorization: "Bearer {{ lookup('env', 'CONTROLLER_OAUTH_TOKEN') | default(onboarding_controller_oauth) }}"
-        validate_certs: "{{ lookup('env', 'CONTROLLER_VERIFY_SSL') | default(onboarding_controller_ssl) }}"
+        validate_certs: "{{ onboarding_controller_ssl }}"
       register: _settings
 
     - name: Parse JSON to retrieve LDAP team mapping information
@@ -57,7 +57,6 @@
         settings:
           AUTH_LDAP_TEAM_MAP:
             "{{ onboarding_current_config | combine(onboarding_next_config) }}"
-        validate_certs: "{{ lookup('env', 'CONTROLLER_VERIFY_SSL') | default(onboarding_controller_ssl) }}"
 
     - name: Create {{ onboarding_app_code }} team
       awx.awx.tower_team:
