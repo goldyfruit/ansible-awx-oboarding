@@ -48,9 +48,9 @@
       ansible.builtin.set_fact:
         onboarding_next_config: >-
           {
-            "LDAP {{ app_code }}": {
+            "LDAP {{ onboarding_app_code }}": {
               "organization": "LDAP Organization",
-              "users": "cn={{ app_code | lower }},ou=groups,dc=example,dc=com",
+              "users": "cn={{ onboarding_app_code | lower }},ou=groups,dc=example,dc=com",
               "remove": true
             }
           }
