@@ -7,7 +7,6 @@
   vars:
     onboarding_controller_host: 127.0.0.1
     onboarding_controller_ssl: no
-    onboarding_controller_oauth: replaceme
     onboarding_app_code: UTI0
     onboarding_organization: UTI0_SelfPatch
     onboarding_team_name: "{{ onboarding_app_code }}"
@@ -34,7 +33,7 @@
         method: GET
         return_content: yes
         headers:
-          Authorization: "Bearer {{ onboarding_controller_oauth }}"
+          Authorization: "Bearer {{ bearer_token }}"
         validate_certs: "{{ onboarding_controller_ssl }}"
       register: _settings
 
