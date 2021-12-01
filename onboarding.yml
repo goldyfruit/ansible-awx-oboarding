@@ -25,9 +25,7 @@
       - devroot
 
   environment:
-    CONTROLLER_HOST: "{{ onboarding_controller_host }}"
     CONTROLLER_VERIFY_SSL: "{{ onboarding_controller_ssl }}"
-    CONTROLLER_OAUTH_TOKEN: 
 
   tasks:
     - name: Retrieve Ansible Tower current LDAP configuration
