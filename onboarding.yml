@@ -24,6 +24,10 @@
     onboarding_job_credentials:
       - devroot
 
+  environment:
+    CONTROLLER_HOST: "{{ onboarding_controller_host }}"
+    CONTROLLER_VERIFY_SSL: "{{ onboarding_controller_ssl }}"
+
   tasks:
     - name: Retrieve Ansible Tower current LDAP configuration
       ansible.builtin.uri:
