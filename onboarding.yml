@@ -7,6 +7,7 @@
   vars:
     onboarding_controller_host: 127.0.0.1
     onboarding_controller_ssl: no
+    onboarding_controller_oauth: replaceme
     onboarding_app_code: UIT0
     onboarding_organization: UTI0_SelfPatch
     onboarding_team_name: "{{ onboarding_app_code }}"
@@ -23,19 +24,49 @@
     onboarding_job_credentials:
       - devroot
 
-  environment:
-    CONTROLLER_HOST: "{{ onboarding_controller_host }}"
-    CONTROLLER_VERIFY_SSL: "{{ onboarding_controller_ssl }}"
-
   tasks:
+    - name: Retrieve Ansible Tower current LDAP configuration
+      ansible.builtin.uri:
+        url: "{{ lookup('env', 'CONTROLLER_HOST') | default(onboarding_controller_host) }}/api/v2/settings/ldap"
+        method: GET
+        return_content: yes
+        headers:
+          Authorization: "Bearer {{ lookup('env', 'CONTROLLER_OAUTH_TOKEN') | default(onboarding_controller_oauth) }}"
+        validate_certs: "{{ lookup('env', 'CONTROLLER_VERIFY_SSL') | default(onboarding_controller_ssl) }}"
+      register: _settings
+
+    - name: Parse JSON to retrieve LDAP team mapping information
+      vars:
+        jq: 'json.AUTH_LDAP_TEAM_MAP'
+      ansible.builtin.set_fact:
+        onboarding_current_config: "{{ _settings | json_query(jq) }}"
+
+    - name: Build JSON payload for LDAP team mapping
+      ansible.builtin.set_fact:
+        onboarding_next_config: >-
+          {
+            "LDAP {{ app_code }}": {
+              "organization": "LDAP Organization",
+              "users": "cn={{ app_code | lower }},ou=groups,dc=example,dc=com",
+              "remove": true
+            }
+          }
+
+    - name: Apply LDAP team mapping configuration
+      awx.awx.tower_settings:
+        settings:
+          AUTH_LDAP_TEAM_MAP:
+            "{{ onboarding_current_config | combine(onboarding_next_config) }}"
+        validate_certs: "{{ lookup('env', 'CONTROLLER_VERIFY_SSL') | default(onboarding_controller_ssl) }}"
+
     - name: Create {{ onboarding_app_code }} team
-      awx.awx.team:
+      awx.awx.tower_team:
         name: "{{ onboarding_team_name }}"
         description: "{{ onboarding_team_description }}"
         organization: "{{ onboarding_organization }}"
 
     - name: Create {{ onboarding_app_code }} smart inventory
-      awx.awx.inventory:
+      awx.awx.tower_inventory:
         name: "{{ onboarding_inventory_name }}"
         description: "{{ onboarding_inventory_description }}"
         organization: "{{ onboarding_organization }}"
@@ -43,14 +74,14 @@
         host_filter: "{{ onboarding_inventory_host_filter }}"
 
     - name: Add {{ onboarding_team_name }} to {{ onboarding_inventory_name }} inventory
-      awx.awx.role:
+      awx.awx.tower_role:
         team: "{{ onboarding_team_name }}"
         role: use
         inventories:
           - "{{ onboarding_inventory_name }}"
 
     - name: Create {{ onboarding_job_name }} job template
-      awx.awx.job_template:
+      awx.awx.tower_job_template:
         name: "{{ onboarding_job_name }}"
         job_type: run
         organization: "{{ onboarding_organization }}"
@@ -64,16 +95,9 @@
         allow_simultaneous: yes
 
     - name: Add {{ onboarding_team_name }} to {{ onboarding_job_name }} template
-      awx.awx.role:
+      awx.awx.tower_role:
         team: "{{ onboarding_team_name }}"
         role: admin
         job_templates:
           - "{{ onboarding_job_name }}"
 
-    - name: Add LDAP group mapping
-      awx.awx.settings:
-        settings:
-          AUTH_LDAP_USER_ATTR_MAP:
-            email: "mail"
-            first_name: "givenName"
-            last_name: "surname"
