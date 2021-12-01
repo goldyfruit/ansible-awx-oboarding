@@ -8,7 +8,7 @@
     onboarding_controller_host: 127.0.0.1
     onboarding_controller_ssl: no
     onboarding_controller_oauth: replaceme
-    onboarding_app_code: UIT0
+    onboarding_app_code: UTI0
     onboarding_organization: UTI0_SelfPatch
     onboarding_team_name: "{{ onboarding_app_code }}"
     onboarding_team_description: "{{ onboarding_app_code }} application team"
