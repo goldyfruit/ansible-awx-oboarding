@@ -75,8 +75,7 @@
       ansible.tower.tower_role:
         team: "{{ onboarding_team_name }}"
         role: use
-        inventories:
-          - "{{ onboarding_inventory_name }}"
+        inventory: "{{ onboarding_inventory_name }}"
 
     - name: Create {{ onboarding_job_name }} job template
       ansible.tower.tower_job_template:
@@ -96,5 +95,4 @@
       ansible.tower.tower_role:
         team: "{{ onboarding_team_name }}"
         role: admin
-        job_templates:
-          - "{{ onboarding_job_name }}"
+        job_template: "{{ onboarding_job_name }}"
